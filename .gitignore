@@ -1,0 +1,33 @@
+# Data (Kaggle competition files - do not commit, may violate competition rules)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Outputs
+outputs/models/*
+!outputs/models/.gitkeep
+outputs/submissions/*
+!outputs/submissions/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Env
+.venv/
+venv/
+env/
+.env
+
+# OS / IDE
+.DS_Store
+.vscode/
+!.vscode/settings.json.example
+
+# Jupyter
+*.ipynb_checkpoints
