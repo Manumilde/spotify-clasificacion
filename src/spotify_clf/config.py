@@ -1,15 +1,11 @@
 """Paths y nombres de columnas del dataset.
 
-Ajustado a la competencia real del TP2 (dataset anonimizado por la
-cátedra, 6 géneros): `train.csv` trae las features + la columna de
-género; `test.csv` trae las features + una columna `Id` sintética
-(secuencial, generada solo para que Kaggle evalúe). No hay `track_id`,
-`artists`, `album_name` ni `track_name` (fueron eliminados al anonimizar).
-
-Si al abrir su `train.csv`/`test.csv` real los nombres de columnas no
-coinciden con lo de acá (por ejemplo si el target no se llama
-`track_genre`), alcanza con ajustar las constantes de este archivo — el
-resto del código no necesita tocarse.
+Según la descripción oficial del dataset de la competencia: `train.csv`
+trae las features acústicas + la columna objetivo `Expected` (el género,
+6 valores posibles); `test.csv` trae las mismas features + una columna
+`Id` (numérica, secuencial, generada por la cátedra solo para el cruce de
+predicciones en Kaggle, sin valor predictivo) y no trae `Expected`. No hay
+`track_id`, `artists`, `album_name` ni `track_name` (dataset anonimizado).
 """
 from pathlib import Path
 
@@ -24,21 +20,15 @@ TRAIN_PATH = DATA_RAW_DIR / "train.csv"
 TEST_PATH = DATA_RAW_DIR / "test.csv"
 REFERENCE_PATH = DATA_RAW_DIR / "dataset_reference.csv"
 
-# Nombre de la columna id en test.csv (solo test.csv la trae; en train.csv
-# no debería existir). Verificar mayúscula/minúscula ("Id") contra el
-# archivo real una vez descargado.
+# Id numérico secuencial, solo en test.csv, sin valor predictivo (no usar
+# como feature).
 ID_COL = "Id"
 
-# Nombre de la columna de género en train.csv. TODO: confirmar contra el
-# train.csv real de la competencia (la cátedra no lo detalla en la
-# consigna) y ajustar acá si es distinto (ej. "genre", "Genre").
-TARGET_COL = "track_genre"
-
-# Nombre de columna que exige el formato de submission de Kaggle para esta
-# competencia (ver consigna: "Id,Expected"). Distinto de TARGET_COL a
-# propósito: adentro del proyecto trabajamos con TARGET_COL, y solo al
-# armar el CSV final se renombra a lo que pide Kaggle.
-SUBMISSION_TARGET_COL = "Expected"
+# Columna objetivo, tal cual la define la cátedra: presente en train.csv,
+# ausente en test.csv, y es también el nombre de columna que exige el
+# formato de submission de Kaggle ("Id,Expected").
+TARGET_COL = "Expected"
+SUBMISSION_TARGET_COL = TARGET_COL
 
 # El dataset fue anonimizado por la cátedra: no hay columnas de texto
 # libre (track_id/artists/album_name/track_name ya no existen). Se deja
@@ -46,7 +36,10 @@ SUBMISSION_TARGET_COL = "Expected"
 # columnas no está presente.
 TEXT_COLS: list[str] = []
 
-# Features categóricas de baja cardinalidad (se codifican con one-hot)
+# Features categóricas de baja cardinalidad (se codifican con one-hot).
+# Nota: `key` puede valer -1 cuando Spotify no detectó tonalidad; con
+# OneHotEncoder eso simplemente se trata como un nivel más, no requiere
+# manejo especial.
 CATEGORICAL_COLS = ["key", "mode", "time_signature", "explicit"]
 
 # Features numéricas continuas (se escalan)

@@ -7,13 +7,21 @@ cátedra.
 
 **Sobre la competencia**: se accede con el link del Campus Virtual (no es
 un dataset público de Kaggle) — hay que unirse ("Join Competition") y
-descargar `train.csv`/`test.csv` desde la pestaña "Data" de esa
-competencia. El dataset fue **anonimizado**: no tiene `track_id`,
-`artists`, `album_name` ni `track_name`, y las filas están en orden
-aleatorio. `test.csv` trae una columna `Id` sintética (secuencial, solo
-para que Kaggle empareje las predicciones); esa columna no está en
-`train.csv`. Formato de submission exigido: dos columnas, `Id,Expected`
-(ver sección 6). Límite: **5 envíos por día por equipo**.
+descargar de la pestaña "Data" de esa competencia:
+
+- `train.csv`: features acústicas + columna objetivo **`Expected`** (el
+  género, 6 valores posibles).
+- `test.csv`: las mismas features, sin `Expected`, más una columna `Id`
+  (numérica secuencial, generada por la cátedra solo para el cruce de
+  predicciones — no tiene valor predictivo).
+- `sample_submission.csv`: plantilla con el formato exacto a subir. Si
+  está disponible, es la referencia más confiable sobre el formato
+  (por encima de lo que se explica acá).
+
+El dataset fue **anonimizado**: no tiene `track_id`, `artists`,
+`album_name` ni `track_name`. Formato de submission exigido: dos
+columnas, `Id,Expected` (ver sección 6). Límite: **5 envíos por día por
+equipo**.
 
 ## 1. Setup local (VS Code)
 
@@ -44,24 +52,19 @@ features acústicas si todavía no tenés el `train.csv` de la competencia.
 **No es el dataset del TP** y no debe usarse para entrenar el modelo
 final (tiene otro número de géneros y otras columnas).
 
-Columnas esperadas en los archivos reales de la competencia (ver
-`src/spotify_clf/config.py` para ajustar nombres si tu `train.csv`/
-`test.csv` difiere):
+Columnas de los archivos reales de la competencia (ver
+`src/spotify_clf/config.py` si tu `train.csv`/`test.csv` llegara a
+diferir):
 
-- `Id`: sintética, secuencial, **solo en `test.csv`** (no está en train).
-- `popularity`, `duration_ms`, `explicit`, `danceability`, `energy`, `key`,
-  `loudness`, `mode`, `speechiness`, `acousticness`, `instrumentalness`,
-  `liveness`, `valence`, `tempo`, `time_signature` (features).
-- Columna de género (target, solo en `train.csv`) — la consigna no
-  especifica su nombre exacto; por default el código asume
-  `track_genre` (`config.TARGET_COL`). **Abrí tu `train.csv` y confirmá
-  el nombre real de esa columna** antes de correr el notebook; si es
-  distinto, cambiá `TARGET_COL` en `src/spotify_clf/config.py` (una sola
-  línea, el resto del código no necesita tocarse).
-
-El formato de submission que exige Kaggle (`Id,Expected`) es distinto del
-nombre interno del target — está en `config.SUBMISSION_TARGET_COL` y ya
-lo arma así `src/spotify_clf/submission.py`.
+- `Id`: numérica secuencial, **solo en `test.csv`**, sin valor
+  predictivo (no usar como feature).
+- `Expected`: género musical (target). Está en `train.csv`, ausente en
+  `test.csv` (es lo que hay que predecir), y es también el nombre exacto
+  de columna que pide el formato de submission.
+- Features: `popularity`, `duration_ms`, `explicit`, `danceability`,
+  `energy`, `key` (-1 si Spotify no detectó tonalidad), `loudness`,
+  `mode`, `speechiness`, `acousticness`, `instrumentalness`, `liveness`,
+  `valence`, `tempo`, `time_signature`.
 
 ## 3. Estructura
 

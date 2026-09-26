@@ -3,9 +3,8 @@
 La métrica oficial de la competencia es F1-Macro sobre la predicción top-1
 (no top-3), así que la submission lleva una sola etiqueta por fila. El
 formato exigido por esta competencia es exactamente dos columnas,
-`Id,Expected` (ver consigna) — por eso el nombre de columna de salida
-(`SUBMISSION_TARGET_COL`) es distinto del nombre interno del target
-(`TARGET_COL`) que se usa en `train.csv`.
+`Id,Expected` (ver consigna) — coincide con `config.ID_COL`/
+`config.TARGET_COL` tal cual vienen en el dataset.
 """
 from pathlib import Path
 
