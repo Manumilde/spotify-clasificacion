@@ -51,7 +51,7 @@ def get_model_registry(random_state: int = config.RANDOM_STATE) -> dict[str, Mod
             LogisticRegression(max_iter=2000, random_state=random_state)
         ),
         param_grid={
-            "classifier__C": [0.01, 0.1, 1.0, 10.0],
+            "classifier__C": [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 30.0],
             "classifier__class_weight": [None, "balanced"],
         },
     )
@@ -63,9 +63,10 @@ def get_model_registry(random_state: int = config.RANDOM_STATE) -> dict[str, Mod
             RandomForestClassifier(random_state=random_state, n_jobs=-1)
         ),
         param_grid={
-            "classifier__n_estimators": [200, 400, 600],
-            "classifier__max_depth": [None, 10, 20, 30],
-            "classifier__min_samples_leaf": [1, 2, 4],
+            "classifier__n_estimators": [200, 400, 600, 800],
+            "classifier__max_depth": [None, 10, 20, 30, 40],
+            "classifier__min_samples_leaf": [1, 2, 4, 8],
+            "classifier__max_features": ["sqrt", "log2", None],
             "classifier__class_weight": [None, "balanced"],
         },
     )
@@ -77,10 +78,11 @@ def get_model_registry(random_state: int = config.RANDOM_STATE) -> dict[str, Mod
             HistGradientBoostingClassifier(random_state=random_state)
         ),
         param_grid={
-            "classifier__learning_rate": [0.03, 0.1, 0.3],
-            "classifier__max_leaf_nodes": [15, 31, 63],
-            "classifier__max_iter": [100, 200, 300],
-            "classifier__l2_regularization": [0.0, 0.1, 1.0],
+            "classifier__learning_rate": [0.01, 0.03, 0.1, 0.3],
+            "classifier__max_leaf_nodes": [15, 31, 63, 127],
+            "classifier__max_iter": [100, 200, 300, 500],
+            "classifier__l2_regularization": [0.0, 0.1, 1.0, 10.0],
+            "classifier__min_samples_leaf": [10, 20, 30],
         },
     )
 
@@ -89,8 +91,9 @@ def get_model_registry(random_state: int = config.RANDOM_STATE) -> dict[str, Mod
         name="knn",
         pipeline=_make_pipeline(KNeighborsClassifier()),
         param_grid={
-            "classifier__n_neighbors": [5, 11, 21, 41],
+            "classifier__n_neighbors": [3, 5, 7, 9, 11, 15, 21, 31, 41, 51],
             "classifier__weights": ["uniform", "distance"],
+            "classifier__p": [1, 2],  # 1 = distancia Manhattan, 2 = Euclídea
         },
     )
 
