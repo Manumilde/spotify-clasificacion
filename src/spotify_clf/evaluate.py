@@ -39,6 +39,15 @@ def cross_validate_model(
         pipeline, X, y, cv=cv, scoring=scoring, n_jobs=n_jobs, return_train_score=False
     )
 
+    if pd.isna(scores["test_f1_macro"]).any() or pd.isna(scores["test_map_at_3"]).any():
+        raise RuntimeError(
+            f"cross_validate_model('{name}') dio NaN en algún fold. Esto suele "
+            "indicar que un scorer está fallando dentro de cross_validate (sklearn "
+            "lo tapa como NaN en vez de propagar el error) — no confíes en esta "
+            "comparación de modelos hasta resolverlo. Probá n_jobs=1 para ver el "
+            "traceback real."
+        )
+
     return EvalResult(
         model_name=name,
         f1_macro_mean=scores["test_f1_macro"].mean(),

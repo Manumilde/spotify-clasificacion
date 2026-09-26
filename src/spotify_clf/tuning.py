@@ -58,4 +58,14 @@ def tune_model(
         raise ValueError(f"search_type debe ser 'grid' o 'random', recibido: {search_type}")
 
     search.fit(X, y)
+
+    if search.best_score_ != search.best_score_:  # NaN check sin importar numpy
+        raise RuntimeError(
+            f"El mejor score de la búsqueda para '{spec.name}' es NaN. Esto suele "
+            "indicar que el scorer está fallando dentro de la búsqueda (sklearn lo "
+            "tapa como NaN en vez de propagar el error). Probá reproducir el error "
+            "corriendo `scoring(search.best_estimator_, X, y)` manualmente, o "
+            "`GridSearchCV(..., error_score='raise')`, para ver el traceback real."
+        )
+
     return search

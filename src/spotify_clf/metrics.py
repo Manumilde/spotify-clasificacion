@@ -6,7 +6,7 @@ al modelo si el género correcto aparece entre sus top-3 predicciones
 esté. A diferencia de F1-Macro, no exige acertar en la primera predicción.
 """
 import numpy as np
-from sklearn.metrics import f1_score, make_scorer
+from sklearn.metrics import f1_score
 
 
 def f1_macro(y_true, y_pred) -> float:
@@ -65,10 +65,19 @@ def map_at_3_from_model(model, X, y_true, k: int = 3) -> float:
     return mean_average_precision_at_k(y_true, ranked, k=k)
 
 
-# Scorer de sklearn para F1-Macro, usable directo en GridSearchCV /
-# RandomizedSearchCV / cross_validate (scoring="f1_macro" ya viene
-# incluido en sklearn, pero lo dejamos explícito por claridad).
-f1_macro_scorer = make_scorer(f1_score, average="macro")
+def f1_macro_scorer(estimator, X, y):
+    """Scorer compatible con la API de sklearn (`scoring=f1_macro_scorer`)
+    para usar F1-Macro en cross_validate / GridSearchCV / RandomizedSearchCV.
+
+    Nota: se implementa como función plana (en vez de
+    `sklearn.metrics.make_scorer(f1_score, average="macro")`) porque en
+    algunas instalaciones de scikit-learn ese scorer falla silenciosamente
+    dentro de la búsqueda paralela (sklearn lo tapa devolviendo NaN en vez
+    de propagar el error) — lo cual puede hacer que se "elija" el peor
+    modelo sin ningún aviso. Con una función así, si algo sale mal, el
+    error se propaga normalmente en vez de convertirse en un NaN silencioso.
+    """
+    return f1_score(y, estimator.predict(X), average="macro")
 
 
 def map_at_3_scorer(estimator, X, y):
