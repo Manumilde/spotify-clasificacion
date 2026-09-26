@@ -1,7 +1,11 @@
 """Generación del CSV de submission para Kaggle.
 
 La métrica oficial de la competencia es F1-Macro sobre la predicción top-1
-(no top-3), así que la submission lleva una sola etiqueta por fila.
+(no top-3), así que la submission lleva una sola etiqueta por fila. El
+formato exigido por esta competencia es exactamente dos columnas,
+`Id,Expected` (ver consigna) — por eso el nombre de columna de salida
+(`SUBMISSION_TARGET_COL`) es distinto del nombre interno del target
+(`TARGET_COL`) que se usa en `train.csv`.
 """
 from pathlib import Path
 
@@ -14,7 +18,7 @@ def build_submission(
     ids: pd.Series,
     predictions,
     id_col: str = config.ID_COL,
-    target_col: str = config.TARGET_COL,
+    target_col: str = config.SUBMISSION_TARGET_COL,
 ) -> pd.DataFrame:
     return pd.DataFrame({id_col: ids.values, target_col: predictions})
 

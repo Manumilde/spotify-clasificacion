@@ -1,8 +1,19 @@
 # Spotify - Clasificación de Género Musical (TD6 - TP2)
 
-Estructura de proyecto para el TP2 de Tecnología Digital VI (clasificación
-multiclase de género musical a partir de métricas acústicas de Spotify,
-competencia interna de Kaggle).
+Estructura de proyecto para el TP2 de Tecnología Digital VI: clasificación
+multiclase de género musical (**6 géneros**) a partir de métricas
+acústicas de Spotify, competencia interna de Kaggle armada por la
+cátedra.
+
+**Sobre la competencia**: se accede con el link del Campus Virtual (no es
+un dataset público de Kaggle) — hay que unirse ("Join Competition") y
+descargar `train.csv`/`test.csv` desde la pestaña "Data" de esa
+competencia. El dataset fue **anonimizado**: no tiene `track_id`,
+`artists`, `album_name` ni `track_name`, y las filas están en orden
+aleatorio. `test.csv` trae una columna `Id` sintética (secuencial, solo
+para que Kaggle empareje las predicciones); esa columna no está en
+`train.csv`. Formato de submission exigido: dos columnas, `Id,Expected`
+(ver sección 6). Límite: **5 envíos por día por equipo**.
 
 ## 1. Setup local (VS Code)
 
@@ -27,23 +38,30 @@ data/raw/train.csv
 data/raw/test.csv
 ```
 
-`data/raw/` incluye un `dataset.csv` de referencia (opcional, mismo esquema
-de columnas que el dataset original de Spotify) solo para explorar el
-esquema si todavía no tenés el `train.csv` de la competencia — no es el
-dataset de la competencia y no debe usarse para entrenar el modelo final.
+`data/raw/dataset_reference.csv` es el dataset original completo (114
+géneros, sin anonimizar) — sirve solo para explorar el esquema de las
+features acústicas si todavía no tenés el `train.csv` de la competencia.
+**No es el dataset del TP** y no debe usarse para entrenar el modelo
+final (tiene otro número de géneros y otras columnas).
 
-Columnas esperadas (ver `src/spotify_clf/config.py` para ajustar nombres si
-la competencia usa otros):
+Columnas esperadas en los archivos reales de la competencia (ver
+`src/spotify_clf/config.py` para ajustar nombres si tu `train.csv`/
+`test.csv` difiere):
 
-- `track_id`, `artists`, `album_name`, `track_name` (identificadores/texto)
+- `Id`: sintética, secuencial, **solo en `test.csv`** (no está en train).
 - `popularity`, `duration_ms`, `explicit`, `danceability`, `energy`, `key`,
   `loudness`, `mode`, `speechiness`, `acousticness`, `instrumentalness`,
-  `liveness`, `valence`, `tempo`, `time_signature` (features)
-- `track_genre` (target, solo en train)
+  `liveness`, `valence`, `tempo`, `time_signature` (features).
+- Columna de género (target, solo en `train.csv`) — la consigna no
+  especifica su nombre exacto; por default el código asume
+  `track_genre` (`config.TARGET_COL`). **Abrí tu `train.csv` y confirmá
+  el nombre real de esa columna** antes de correr el notebook; si es
+  distinto, cambiá `TARGET_COL` en `src/spotify_clf/config.py` (una sola
+  línea, el resto del código no necesita tocarse).
 
-Si la competencia usa nombres de columnas distintos (p. ej. `id` en vez de
-`track_id`, o el target con otro nombre), actualizá `ID_COL` / `TARGET_COL`
-en `src/spotify_clf/config.py` — el resto del código no necesita tocarse.
+El formato de submission que exige Kaggle (`Id,Expected`) es distinto del
+nombre interno del target — está en `config.SUBMISSION_TARGET_COL` y ya
+lo arma así `src/spotify_clf/submission.py`.
 
 ## 3. Estructura
 
@@ -104,10 +122,28 @@ Grid/Randomized, cantidad de folds, etc.).
   modelo, para comparar con F1-Macro y discutir el trade-off de negocio
   (ver notebook, sección final).
 
-## 6. Reproducir el CSV final enviado a Kaggle
+## 6. Cómo subir una submission a Kaggle
+
+1. En la página de la competencia (link del Campus Virtual), pestaña
+   **"Submit Predictions"**, subís el CSV generado en
+   `outputs/submissions/submission.csv`. Tiene que tener exactamente dos
+   columnas: `Id,Expected` (ya lo arma así `submission.py`).
+2. Kaggle te devuelve el score (F1-Macro) y tu posición en el
+   leaderboard. **Máximo 5 envíos por día por equipo** — usen la
+   validación local del notebook (secciones 5-8) para decidir qué modelo
+   mandar, no para iterar a ciegas contra Kaggle.
+3. Si hay un `sample_submission.csv` en la pestaña "Data" de la
+   competencia, úsenlo como referencia exacta del formato esperado.
+
+## 7. Reproducir el CSV final enviado a Kaggle
+
+La consigna pide que el código entregado pueda reproducir exactamente el
+CSV que obtuvo el puntaje final:
 
 1. Colocar `train.csv`/`test.csv` en `data/raw/`.
 2. Correr el notebook de punta a punta (o `scripts/train.py` +
-   `scripts/predict.py` con el modelo elegido).
-3. El CSV queda en `outputs/submissions/submission.csv`, listo para subir a
-   Kaggle.
+   `scripts/predict.py` con el modelo elegido) — las semillas están
+   fijadas (`config.RANDOM_STATE`) para que el resultado sea reproducible.
+3. El CSV queda en `outputs/submissions/submission.csv`, idéntico al que
+   se subió a Kaggle para el puntaje final (no lo vuelvan a generar con
+   otro modelo/hiperparámetros después de la entrega final).
