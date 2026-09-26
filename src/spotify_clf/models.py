@@ -18,11 +18,56 @@ from . import config
 from .preprocessing import build_preprocessor
 
 try:
+    from sklearn.preprocessing import LabelEncoder
     from xgboost import XGBClassifier
 
     _HAS_XGBOOST = True
 except ImportError:  # pragma: no cover - xgboost es opcional
     _HAS_XGBOOST = False
+
+
+if _HAS_XGBOOST:
+
+    class LabelEncodedXGBClassifier(XGBClassifier):
+        """XGBClassifier (a partir de xgboost >= 2.x) ya no acepta
+        etiquetas de texto: exige que `y` venga codificado como enteros
+        0..n_clases-1, a diferencia del resto de los clasificadores de
+        sklearn que se usan en este proyecto (que aceptan strings
+        directamente). Este wrapper codifica/decodifica las etiquetas de
+        forma transparente para poder usarlo dentro del mismo Pipeline,
+        con la misma interfaz (fit/predict/predict_proba) que los demás
+        modelos del registro.
+        """
+
+        def fit(self, X, y, **kwargs):
+            self._label_encoder = LabelEncoder()
+            y_encoded = self._label_encoder.fit_transform(y)
+            # Mientras corre super().fit(), XGBoost valida internamente
+            # que self.classes_ coincida con np.unique(y) del propio y
+            # que se le pasa (enteros acá) — con self._fitting=True nuestra
+            # property cae al comportamiento nativo (np.arange(n_classes_))
+            # para no romper esa validación interna.
+            self._fitting = True
+            try:
+                super().fit(X, y_encoded, **kwargs)
+            finally:
+                self._fitting = False
+            return self
+
+        @property
+        def classes_(self):
+            # `classes_` es una property de solo lectura en XGBClassifier.
+            # Fuera de fit(), la pisamos para exponer las etiquetas
+            # originales en vez de los enteros 0..n-1: predict_proba ya
+            # devuelve las columnas en ese mismo orden (alfabético), así
+            # que no hace falta reordenar nada.
+            if getattr(self, "_fitting", False) or not hasattr(self, "_label_encoder"):
+                return super().classes_
+            return self._label_encoder.classes_
+
+        def predict(self, X):
+            y_encoded = super().predict(X)
+            return self._label_encoder.inverse_transform(y_encoded)
 
 
 @dataclass
@@ -101,7 +146,7 @@ def get_model_registry(random_state: int = config.RANDOM_STATE) -> dict[str, Mod
         registry["xgboost"] = ModelSpec(
             name="xgboost",
             pipeline=_make_pipeline(
-                XGBClassifier(
+                LabelEncodedXGBClassifier(
                     random_state=random_state,
                     eval_metric="mlogloss",
                     n_jobs=-1,
