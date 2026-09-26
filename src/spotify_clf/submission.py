@@ -29,3 +29,35 @@ def save_submission(
     path.parent.mkdir(parents=True, exist_ok=True)
     submission_df.to_csv(path, index=False)
     return path
+
+
+def validate_submission_format(
+    submission_df: pd.DataFrame,
+    sample_path: Path = config.SAMPLE_SUBMISSION_PATH,
+    id_col: str = config.ID_COL,
+    target_col: str = config.SUBMISSION_TARGET_COL,
+) -> None:
+    """Chequea la submission contra `sample_submission.csv` antes de subirla
+    a Kaggle: mismas columnas (y orden), mismo set de `Id` y sin nulos.
+    Si `sample_path` no existe, no hace nada (no todas las competencias lo
+    proveen). Lanza `AssertionError` con un mensaje descriptivo si algo no
+    coincide.
+    """
+    if not Path(sample_path).exists():
+        return
+
+    sample_df = pd.read_csv(sample_path)
+
+    assert list(submission_df.columns) == list(sample_df.columns), (
+        f"Columnas esperadas {list(sample_df.columns)}, "
+        f"encontradas {list(submission_df.columns)}"
+    )
+    assert len(submission_df) == len(sample_df), (
+        f"Se esperaban {len(sample_df)} filas, hay {len(submission_df)}"
+    )
+    assert set(submission_df[id_col]) == set(sample_df[id_col]), (
+        "El set de Id de la submission no coincide con el de sample_submission.csv"
+    )
+    assert submission_df[target_col].notna().all(), (
+        f"Hay valores nulos en la columna '{target_col}'"
+    )

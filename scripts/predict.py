@@ -13,7 +13,7 @@ import joblib
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from spotify_clf import config, data
-from spotify_clf.submission import build_submission, save_submission
+from spotify_clf.submission import build_submission, save_submission, validate_submission_format
 
 
 def main():
@@ -42,6 +42,7 @@ def main():
 
     predictions = pipeline.predict(X_test)
     submission_df = build_submission(test_df[config.ID_COL], predictions)
+    validate_submission_format(submission_df)
 
     out_path = save_submission(submission_df, args.out_path)
     print(f"Submission guardada en {out_path} ({len(submission_df)} filas)")

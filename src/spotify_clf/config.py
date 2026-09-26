@@ -18,6 +18,7 @@ SUBMISSIONS_DIR = PROJECT_ROOT / "outputs" / "submissions"
 
 TRAIN_PATH = DATA_RAW_DIR / "train.csv"
 TEST_PATH = DATA_RAW_DIR / "test.csv"
+SAMPLE_SUBMISSION_PATH = DATA_RAW_DIR / "sample_submission.csv"
 REFERENCE_PATH = DATA_RAW_DIR / "dataset_reference.csv"
 
 # Id numérico secuencial, solo en test.csv, sin valor predictivo (no usar

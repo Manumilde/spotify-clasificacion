@@ -44,6 +44,7 @@ colocalos así:
 ```
 data/raw/train.csv
 data/raw/test.csv
+data/raw/sample_submission.csv   # opcional pero recomendado (ver sección 6)
 ```
 
 `data/raw/dataset_reference.csv` es el dataset original completo (114
@@ -135,8 +136,12 @@ Grid/Randomized, cantidad de folds, etc.).
    leaderboard. **Máximo 5 envíos por día por equipo** — usen la
    validación local del notebook (secciones 5-8) para decidir qué modelo
    mandar, no para iterar a ciegas contra Kaggle.
-3. Si hay un `sample_submission.csv` en la pestaña "Data" de la
-   competencia, úsenlo como referencia exacta del formato esperado.
+3. Si colocan `sample_submission.csv` en `data/raw/` (está en la pestaña
+   "Data" de la competencia), `submission.validate_submission_format()`
+   lo usa automáticamente para chequear, antes de guardar el CSV, que las
+   columnas, la cantidad de filas y el set de `Id` coincidan exactamente
+   — así evitan un envío rechazado por formato. Ya está integrado en el
+   notebook (sección 10) y en `scripts/predict.py`.
 
 ## 7. Reproducir el CSV final enviado a Kaggle
 
