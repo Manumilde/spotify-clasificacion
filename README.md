@@ -74,7 +74,8 @@ data/
   raw/            # train.csv, test.csv (no versionados)
   processed/      # artefactos intermedios (no versionados)
 notebooks/
-  TP2_spotify_clasificacion.ipynb   # notebook entregable (EDA, modelos, informe)
+  TP2_spotify_clasificacion.ipynb              # versión modular: importa src/spotify_clf (para desarrollo)
+  TP2_spotify_clasificacion_standalone.ipynb   # versión 100% autocontenida (para ENTREGAR)
 src/spotify_clf/
   config.py         # paths y nombres de columnas
   data.py           # carga de datos y split train/val
@@ -93,6 +94,26 @@ outputs/
 ```
 
 ## 4. Flujo de trabajo
+
+### ¿Cuál notebook usar?
+
+La consigna pide un `.ipynb` que incluya **todo el código**. Hay dos
+versiones, con el mismo contenido y resultados:
+
+- **`TP2_spotify_clasificacion.ipynb`** (modular): importa las funciones
+  de `src/spotify_clf`. Recomendado para trabajar día a día — separa la
+  lógica pesada del análisis. **No corre solo**: necesita la carpeta
+  `src/` al lado.
+- **`TP2_spotify_clasificacion_standalone.ipynb`** (autocontenido): tiene
+  todo el mismo código de `src/spotify_clf` pegado en celdas al
+  principio del propio notebook. No depende de ninguna carpeta del
+  proyecto — **es el que hay que subir al Campus Virtual**. Solo
+  necesita `train.csv`/`test.csv` (y opcionalmente `sample_submission.csv`)
+  al lado del notebook o en `data/raw/`.
+
+Si modificás algo en `src/spotify_clf/` (un bugfix, una grilla de
+hiperparámetros, etc.), replicá el cambio a mano en la celda
+correspondiente del notebook standalone antes de la entrega final.
 
 ### Opción A: notebook (recomendado para EDA + informe)
 
